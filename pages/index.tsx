@@ -1,8 +1,4 @@
-import Head from "next/head";
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
 import monaco from "monaco-editor";
 
@@ -21,8 +17,6 @@ function draw() {
 }
 `;
 
-const inter = Inter({ subsets: ["latin"] });
-
 export default function Home() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -34,10 +28,11 @@ export default function Home() {
     monaco: any /* Monaco */
   ) {
     editorRef.current = editor;
+    play();
   }
 
   function play() {
-    if (iframeRef.current) {
+    if (iframeRef.current && editorRef.current) {
       console.log("Value", editorRef.current?.getValue());
       iframeRef.current.src =
         "/api/viewer?sketch=" +
