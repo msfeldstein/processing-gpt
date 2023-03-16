@@ -58,7 +58,17 @@ export default function Home() {
         }),
       }).then((r) => r.text());
       result = result.replaceAll("[BEGIN]", "").replaceAll("[END]", "").trim();
-      editorRef.current?.setValue(result);
+      const editor = editorRef.current;
+      if (editor) {
+        editor.pushUndoStop();
+        editor.executeEdits("update-from-gpt", [
+          {
+            range: editor.getModel()!.getFullModelRange(),
+            text: result,
+          },
+        ]);
+        editor.pushUndoStop();
+      }
       setLoading(false);
       play();
     }
