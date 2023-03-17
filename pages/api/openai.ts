@@ -38,16 +38,15 @@ export default async function handler(
     data,
     { headers }
   );
-  console.log("About to send")
+  console.log("Query", query)
+  console.log("Response", r.data.choices[0].message.content)
   res.send(r.data.choices[0].message.content);
-  console.log("Lets log")
-  const collection = await getCollection("logs")
-  console.log("Got collection")
-    await collection.insertOne({
-      query: query,
-      originalSketch: currentSketch,
-      output: r.data.choices[0].message.content
-    })
-    console.log("Inserted")
+  // const collection = await getCollection("logs")
+  //   await collection.insertOne({
+  //     query: query,
+  //     originalSketch: currentSketch,
+  //     output: r.data.choices[0].message.content
+  //   })
+  //   console.log("Inserted")
 
 }
