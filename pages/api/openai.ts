@@ -42,10 +42,11 @@ export default async function handler(
   );
   console.log("Query", query);
   console.log("Response", r.data.choices[0].message.content);
-  res.send(r.data.choices[0].message.content);
+  console.log("Loggign to", "https://" + req.headers.host + "/api/log");
   axios.post("https://" + req.headers.host + "/api/log", {
     query,
     newSketch: r.data.choices[0].message.content,
     currentSketch,
   });
+  res.send(r.data.choices[0].message.content);
 }
