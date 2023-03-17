@@ -38,6 +38,7 @@ export default async function handler(
     data,
     { headers }
   );
+  console.log("About to send")
   res.send(r.data.choices[0].message.content);
   const collection = await getCollection("logs")
   console.log("Got collection")
