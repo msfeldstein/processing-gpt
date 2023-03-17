@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import monaco from "monaco-editor";
-import p5Types from "./p5types";
-console.log({ p5Types });
+import { types } from "./p5types";
+
 const prelude = `You are a creative coding assistant who is going to help me write p5js sketches.  Please respond only with the code that should be run, no explanations.  I will put the current code between [BEGIN] and [END] tokens, with the query of how i'd like you to modify the sketch below.  Be sure to only respond with the full representation of the modified code and no editorial or explanations.`;
 const sketchBegin = "[BEGIN]";
 const sketchEnd = "[END]";
@@ -30,7 +30,7 @@ export default function Home() {
   ) {
     editorRef.current = editor;
     play();
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(p5Types);
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(types);
   }
 
   function play() {
@@ -51,7 +51,6 @@ export default function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: JSON.stringify({
           query: [prelude, sketchBegin, currentSketch, sketchEnd, query].join(
@@ -62,6 +61,7 @@ export default function Home() {
       result = result.replaceAll("[BEGIN]", "").replaceAll("[END]", "").trim();
       const editor = editorRef.current;
       if (editor) {
+        // Need to do this instead of calling setValue so you can cmd+z it
         editor.pushUndoStop();
         editor.executeEdits("update-from-gpt", [
           {
@@ -84,7 +84,11 @@ export default function Home() {
           onMount={handleEditorDidMount}
           defaultLanguage="javascript"
           defaultValue={defaultScript}
-          options={{ minimap: { enabled: false }, automaticLayout: true }}
+          options={{
+            minimap: { enabled: false },
+            automaticLayout: true,
+            language: "javascript",
+          }}
         />
       </div>
       <div className="PreviewContainer">

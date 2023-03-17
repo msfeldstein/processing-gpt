@@ -9034,4 +9034,4 @@ declare global {
     let soundOut: object;
 }
 `
-export default types
+export { types }
