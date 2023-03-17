@@ -6,6 +6,7 @@ const getDatabase = async () => {
   if (!client) {
     console.log('Connecting to database', process.env.DATABASE_URL);
     client = await MongoClient.connect(process.env.DATABASE_URL!, {
+        // @ts-ignore
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
