@@ -40,10 +40,12 @@ export default async function handler(
   );
   res.send(r.data.choices[0].message.content);
   const collection = await getCollection("logs")
-    collection.insertOne({
+  console.log("Got collection")
+    await collection.insertOne({
       query: query,
       originalSketch: currentSketch,
       output: r.data.choices[0].message.content
     })
+    console.log("Inserted")
 
 }
