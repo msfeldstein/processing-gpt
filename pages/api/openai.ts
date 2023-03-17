@@ -1,7 +1,6 @@
-
-import axios from 'axios';
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { getCollection } from './_database';
+import axios from "axios";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { getCollection } from "./_database";
 
 const API_KEY = process.env["OPENAI_API_KEY"];
 
@@ -9,19 +8,22 @@ const prelude = `You are a creative coding assistant who is going to help me wri
 const sketchBegin = "[BEGIN]";
 const sketchEnd = "[END]";
 
-
 type Data = {
-  name: string
-}
+  name: string;
+};
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const {query, currentSketch} = req.body
-  const fullQuery = [prelude, sketchBegin, currentSketch, sketchEnd, query].join(
-    "\n\n"
-  )
+  const { query, currentSketch } = req.body;
+  const fullQuery = [
+    prelude,
+    sketchBegin,
+    currentSketch,
+    sketchEnd,
+    query,
+  ].join("\n\n");
   const messages = [
     {
       role: "user",
@@ -38,15 +40,12 @@ export default async function handler(
     data,
     { headers }
   );
-  console.log("Query", query)
-  console.log("Response", r.data.choices[0].message.content)
+  console.log("Query", query);
+  console.log("Response", r.data.choices[0].message.content);
   res.send(r.data.choices[0].message.content);
-  // const collection = await getCollection("logs")
-  //   await collection.insertOne({
-  //     query: query,
-  //     originalSketch: currentSketch,
-  //     output: r.data.choices[0].message.content
-  //   })
-  //   console.log("Inserted")
-
+  axios.post("https://" + req.headers.host + "/api/log", {
+    query,
+    newSketch: r.data.choices[0].message.content,
+    currentSketch,
+  });
 }
