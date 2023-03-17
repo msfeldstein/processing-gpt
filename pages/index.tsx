@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
-import Editor from "@monaco-editor/react";
+import Editor, { Monaco } from "@monaco-editor/react";
 import monaco from "monaco-editor";
 
-const prelude = `You are a creative coding assistant who is going to help me write p5js sketches.  Please respond only with the code that should be run, no explanations.  I will put the current code between [BEGIN] and [END] tokens, with the query of how i'd like you to modify the sketch below.`;
+const prelude = `You are a creative coding assistant who is going to help me write p5js sketches.  Please respond only with the code that should be run, no explanations.  I will put the current code between [BEGIN] and [END] tokens, with the query of how i'd like you to modify the sketch below.  Be sure to only respond with the full representation of the modified code and no editorial or explanations.`;
 const sketchBegin = "[BEGIN]";
 const sketchEnd = "[END]";
 
@@ -25,10 +25,11 @@ export default function Home() {
 
   function handleEditorDidMount(
     editor: monaco.editor.IStandaloneCodeEditor,
-    monaco: any /* Monaco */
+    monaco: Monaco
   ) {
     editorRef.current = editor;
     play();
+    // monaco.languages.typescript.javascriptDefaults.addExtraLib();
   }
 
   function play() {
