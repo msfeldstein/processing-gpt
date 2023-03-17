@@ -5,7 +5,6 @@ export default async function handler(
   res: NextApiResponse<string>
 ) {
     const sketch = req.query.sketch;
-    console.log("SKETCH", sketch);
     const src =
       `<!doctype html>
   <html lang="en">
@@ -26,7 +25,6 @@ export default async function handler(
     <main></main> 
     </body>
   </html>`;
-    console.log("SRC", src);
     res.send(src);
 }
 

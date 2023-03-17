@@ -53,9 +53,8 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          query: [prelude, sketchBegin, currentSketch, sketchEnd, query].join(
-            "\n\n"
-          ),
+          query,
+          currentSketch,
         }),
       }).then((r) => r.text());
       result = result.replaceAll("[BEGIN]", "").replaceAll("[END]", "").trim();
