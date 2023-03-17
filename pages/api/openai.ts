@@ -40,6 +40,7 @@ export default async function handler(
   );
   console.log("About to send")
   res.send(r.data.choices[0].message.content);
+  console.log("Lets log")
   const collection = await getCollection("logs")
   console.log("Got collection")
     await collection.insertOne({

@@ -16,6 +16,7 @@ const getDatabase = async () => {
 
 const getCollection = async (name: string) => {
   const database = await getDatabase();
+  console.log("Got db")
   return database.collection(name);
 };
 
