@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import monaco from "monaco-editor";
-
+import p5Types from "./p5types";
+console.log({ p5Types });
 const prelude = `You are a creative coding assistant who is going to help me write p5js sketches.  Please respond only with the code that should be run, no explanations.  I will put the current code between [BEGIN] and [END] tokens, with the query of how i'd like you to modify the sketch below.  Be sure to only respond with the full representation of the modified code and no editorial or explanations.`;
 const sketchBegin = "[BEGIN]";
 const sketchEnd = "[END]";
@@ -29,7 +30,7 @@ export default function Home() {
   ) {
     editorRef.current = editor;
     play();
-    // monaco.languages.typescript.javascriptDefaults.addExtraLib();
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(p5Types);
   }
 
   function play() {
