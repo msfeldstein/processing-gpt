@@ -30,11 +30,11 @@ border: 1px solid white;
 box-shadow: 0 0 15px rgba(0,0,0,0.3);
 }
 
-#PromptContainer {
+.PromptContainer {
   margin-top: 16px;
 }
 
-#PromptContainer textarea {
+.PromptContainer textarea {
   width: 90%;
   margin: auto;
   border-radius: 8px;
@@ -48,7 +48,13 @@ box-shadow: 0 0 15px rgba(0,0,0,0.3);
 .button {
   padding: 8px;
   background: gray;
-  display: inline-block;
   color: white;
   border-radius: 4px;;
+}
+
+#button-row {
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
 }
