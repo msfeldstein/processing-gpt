@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import monaco from "monaco-editor";
 import { types } from "../util/p5types";
@@ -34,12 +34,35 @@ Examples:
 - What does line 32 mean?
 - Explain the attractParticle() function`;
 
+function Communing() {
+  return <div id="Communing">Communing...</div>;
+}
+
 export default function Home() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [lastError, setLastError] = useState<string | null>(null);
   const [questionMode, setQuestionMode] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const onMessage = function (msg: MessageEvent) {
+      if (msg.data.p5Error) {
+        setLastError(msg.data.p5Error);
+        console.log("GOT MESSAGE", msg);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => {
+      window.removeEventListener("message", onMessage);
+    };
+  });
+
+  function askForHelp() {
+    textareaRef.current!.value = `I'm getting the following error.  Can you fix it and add comments directly above the changes with what you did? \n\n ${lastError}`;
+    setLastError(null);
+  }
 
   function setQuestionModeAndClear(newQuestionMode: boolean) {
     if (newQuestionMode === questionMode) return;
@@ -162,7 +185,18 @@ export default function Home() {
                 placeholder={questionMode ? questionPlaceholder : placeholder}
               ></textarea>
             </div>
-            <div>{loading && "Communing..."}</div>
+            {lastError && (
+              <div className="ErrorBox">
+                {lastError}
+                <div>
+                  <div className="button" onClick={askForHelp}>
+                    Ask for help
+                  </div>
+                </div>
+              </div>
+            )}
+            {loading && <Communing />}
+            {loading && <div>Communing...</div>}
           </div>
         </div>
       </div>

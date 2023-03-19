@@ -58,3 +58,17 @@ box-shadow: 0 0 15px rgba(0,0,0,0.3);
   flex-direction: row;
   gap: 16px;
 }
+
+#Communing {
+  position:fixed;
+  top:0;
+  left: 0;
+  background: red;
+}
+
+.ErrorBox {
+  background: rgba(255,0,0,0.3);
+  border-radius: 8px;
+  border: 1px solid red;
+  margin: 16px;
+}

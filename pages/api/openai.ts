@@ -8,9 +8,7 @@ const prelude = `You are a creative coding assistant who is going to help me wri
 const sketchBegin = "[BEGIN]";
 const sketchEnd = "[END]";
 
-type Data = {
-  name: string;
-};
+type Data = string;
 
 export default async function handler(
   req: NextApiRequest,
@@ -40,12 +38,16 @@ export default async function handler(
     data,
     { headers }
   );
-  console.log("Query", query);
-  console.log("Response", r.data.choices[0].message.content);
-  axios.post("https://" + req.headers.host + "/api/log", {
-    query,
-    newSketch: r.data.choices[0].message.content,
-    currentSketch,
-  });
-  res.send(r.data.choices[0].message.content);
+  if (r.status === 200) {
+    console.log("Query", query);
+    console.log("Response", r.data.choices[0].message.content);
+    axios.post("https://" + req.headers.host + "/api/log", {
+      query,
+      newSketch: r.data.choices[0].message.content,
+      currentSketch,
+    });
+    res.send(r.data.choices[0].message.content);
+  } else {
+    res.status(400).send("Something went wrong querying openAI");
+  }
 }
