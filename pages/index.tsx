@@ -93,6 +93,7 @@ export default function Home() {
         "/api/viewer?sketch=" +
         encodeURIComponent(editorRef.current!.getValue());
     }
+    setLastError(null);
   }
 
   async function onKeyDown(e: React.KeyboardEvent) {
