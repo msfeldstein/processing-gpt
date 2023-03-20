@@ -75,10 +75,15 @@ box-shadow: 0 0 15px rgba(0,0,0,0.3);
 
 .MobileBanner {
   display: flex;;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   align-content: center;
   height: 100%;
+  padding: 32px;
+  font-size: 32px;
+  box-sizing: border-box;
+  font-family: "SF Mono",Monaco,Menlo,Consolas,"Ubuntu Mono","Liberation Mono","DejaVu Sans Mono","Courier New",monospace;
 }
 
 @media only screen and (max-width: 499px) {

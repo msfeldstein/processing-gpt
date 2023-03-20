@@ -3,6 +3,7 @@ import Editor, { Monaco } from "@monaco-editor/react";
 import monaco from "monaco-editor";
 import { types } from "../util/p5types";
 import Head from "next/head";
+import Image from "next/image";
 
 const prelude = `You are a creative coding assistant who is going to help me write p5js sketches.  Please respond only with the code that should be run, no explanations.  I will put the current code between [BEGIN] and [END] tokens, with the query of how i'd like you to modify the sketch below.  Be sure to only respond with the full representation of the modified code and no editorial or explanations.`;
 const sketchBegin = "[BEGIN]";
@@ -129,7 +130,15 @@ export default function Home() {
 
   return (
     <>
-      <div className="MobileBanner">P5ai only works on desktop</div>
+      <div className="MobileBanner">
+        <div>
+          <Image src="/icon-no-bg.png" alt="logo" width={320} height={320} />
+        </div>
+        <div>
+          P5ai is a p5js editor with an AI assistant, but sadly only works on
+          desktop
+        </div>
+      </div>
       {/* <div id="Header">Header</div> */}
       <div className="App">
         <Head>
