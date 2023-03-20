@@ -72,3 +72,26 @@ box-shadow: 0 0 15px rgba(0,0,0,0.3);
   border: 1px solid red;
   margin: 16px;
 }
+
+.MobileBanner {
+  display: flex;;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  height: 100%;
+}
+
+@media only screen and (max-width: 499px) {
+  .App {
+    display: none;
+  }
+  .MobileBanner {
+    display: flex;
+  }
+}
+
+@media only screen and (min-width: 500px) {
+  .MobileBanner {
+    display: none;
+  }
+}

@@ -129,6 +129,7 @@ export default function Home() {
 
   return (
     <>
+      <div className="MobileBanner">P5ai only works on desktop</div>
       {/* <div id="Header">Header</div> */}
       <div className="App">
         <Head>
