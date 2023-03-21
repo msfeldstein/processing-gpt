@@ -41,7 +41,7 @@ export default async function handler(
   if (r.status === 200) {
     console.log("Query", query);
     console.log("Response", r.data.choices[0].message.content);
-    axios.post("https://" + req.headers.host + "/api/log", {
+    await axios.post("https://" + req.headers.host + "/api/log", {
       query,
       newSketch: r.data.choices[0].message.content,
       currentSketch,
