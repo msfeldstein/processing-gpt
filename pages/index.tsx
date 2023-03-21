@@ -41,27 +41,27 @@ function Communing() {
 
 export default function Home() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
   const [questionMode, setQuestionMode] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [editor, setEditor] =
+    useState<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   useEffect(() => {
-    console.log("HASH", window.location.hash);
+    console.log("HASH", window.location.hash, editor);
     if (
       window.location.hash &&
       window.location.hash.indexOf("#sketch=") === 0
     ) {
-      const editor = editorRef.current;
       editor?.setValue(
         decodeURIComponent(window.location.hash.substring(8))
           .replaceAll("[BEGIN]", "")
           .replaceAll("[END]", "")
       );
-      play();
     }
-  }, []);
+    play();
+  }, [editor, play]);
 
   useEffect(() => {
     const onMessage = function (msg: MessageEvent) {
@@ -91,7 +91,7 @@ export default function Home() {
     editor: monaco.editor.IStandaloneCodeEditor,
     monaco: Monaco
   ) {
-    editorRef.current = editor;
+    setEditor(editor);
     play();
     editor.addAction({
       id: "run-sketch",
@@ -103,19 +103,18 @@ export default function Home() {
   }
 
   function play() {
-    if (iframeRef.current && editorRef.current) {
-      console.log("Value", editorRef.current?.getValue());
+    if (iframeRef.current && editor) {
+      console.log("Value", editor.getValue());
       iframeRef.current.src =
-        "/api/viewer?sketch=" +
-        encodeURIComponent(editorRef.current!.getValue());
+        "/api/viewer?sketch=" + encodeURIComponent(editor.getValue());
     }
     setLastError(null);
   }
 
   async function onKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && editor) {
       setLoading(true);
-      const currentSketch = editorRef.current?.getValue();
+      const currentSketch = editor.getValue();
       const query = textareaRef.current?.value;
       let result = await fetch("/api/openai", {
         method: "POST",
@@ -128,7 +127,6 @@ export default function Home() {
         }),
       }).then((r) => r.text());
       result = result.replaceAll("[BEGIN]", "").replaceAll("[END]", "").trim();
-      const editor = editorRef.current;
       if (editor) {
         // Need to do this instead of calling setValue so you can cmd+z it
         editor.pushUndoStop();

@@ -41,11 +41,13 @@ export default async function handler(
   if (r.status === 200) {
     console.log("Query", query);
     console.log("Response", r.data.choices[0].message.content);
-    await axios.post("https://" + req.headers.host + "/api/log", {
-      query,
-      newSketch: r.data.choices[0].message.content,
-      currentSketch,
-    });
+    if (!req.headers.host?.includes("localhost")) {
+      await axios.post("https://" + req.headers.host + "/api/log", {
+        query,
+        newSketch: r.data.choices[0].message.content,
+        currentSketch,
+      });
+    }
     res.send(r.data.choices[0].message.content);
   } else {
     res.status(400).send("Something went wrong querying openAI");
