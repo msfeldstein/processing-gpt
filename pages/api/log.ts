@@ -9,14 +9,14 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const { query, response, currentSketch } = req.body;
+  const { query, newSketch, currentSketch } = req.body;
   console.log("Query", query);
-  console.log("Response", response);
+  console.log("Response", newSketch);
   const collection = await getCollection("logs");
   await collection.insertOne({
     query: query,
     originalSketch: currentSketch,
-    output: response,
+    output: newSketch,
   });
   console.log("Inserted");
 }
