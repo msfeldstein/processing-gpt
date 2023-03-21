@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import monaco from "monaco-editor";
 import { types } from "../util/p5types";
@@ -42,26 +42,41 @@ function Communing() {
 export default function Home() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
   const [questionMode, setQuestionMode] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [editor, setEditor] =
-    useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [hasLoadedFromHash, setHasLoadedFromHash] = useState(false);
+  const [hasEditor, setHasEditor] = useState(false);
+
+  const play = useCallback(() => {
+    if (iframeRef.current && editorRef.current) {
+      console.log("Value", editorRef.current.getValue());
+      iframeRef.current.src =
+        "/api/viewer?sketch=" +
+        encodeURIComponent(editorRef.current.getValue());
+    }
+    setLastError(null);
+  }, [editorRef]);
 
   useEffect(() => {
-    console.log("HASH", window.location.hash, editor);
+    console.log("HASH", window.location.hash, editorRef.current);
     if (
+      !hasLoadedFromHash &&
       window.location.hash &&
-      window.location.hash.indexOf("#sketch=") === 0
+      window.location.hash.indexOf("#sketch=") === 0 &&
+      editorRef.current &&
+      hasEditor
     ) {
-      editor?.setValue(
+      editorRef.current.setValue(
         decodeURIComponent(window.location.hash.substring(8))
           .replaceAll("[BEGIN]", "")
           .replaceAll("[END]", "")
       );
+      setHasLoadedFromHash(true);
     }
     play();
-  }, [editor, play]);
+  }, [editorRef, hasLoadedFromHash, play, hasEditor]);
 
   useEffect(() => {
     const onMessage = function (msg: MessageEvent) {
@@ -91,7 +106,8 @@ export default function Home() {
     editor: monaco.editor.IStandaloneCodeEditor,
     monaco: Monaco
   ) {
-    setEditor(editor);
+    editorRef.current = editor;
+    setHasEditor(true);
     play();
     editor.addAction({
       id: "run-sketch",
@@ -102,19 +118,11 @@ export default function Home() {
     monaco.languages.typescript.javascriptDefaults.addExtraLib(types);
   }
 
-  function play() {
-    if (iframeRef.current && editor) {
-      console.log("Value", editor.getValue());
-      iframeRef.current.src =
-        "/api/viewer?sketch=" + encodeURIComponent(editor.getValue());
-    }
-    setLastError(null);
-  }
-
   async function onKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter" && editor) {
+    if (e.key === "Enter" && editorRef.current) {
+      const editor = editorRef.current;
       setLoading(true);
-      const currentSketch = editor.getValue();
+      const currentSketch = editorRef.current.getValue();
       const query = textareaRef.current?.value;
       let result = await fetch("/api/openai", {
         method: "POST",
