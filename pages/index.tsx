@@ -48,6 +48,22 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    console.log("HASH", window.location.hash);
+    if (
+      window.location.hash &&
+      window.location.hash.indexOf("#sketch=") === 0
+    ) {
+      const editor = editorRef.current;
+      editor?.setValue(
+        decodeURIComponent(window.location.hash.substring(8))
+          .replaceAll("[BEGIN]", "")
+          .replaceAll("[END]", "")
+      );
+      play();
+    }
+  }, []);
+
+  useEffect(() => {
     const onMessage = function (msg: MessageEvent) {
       if (msg.data.p5Error) {
         setLastError(msg.data.p5Error);
