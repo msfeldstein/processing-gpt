@@ -23,6 +23,7 @@ export default async function handler(
   {
     "imports": {
       "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+      "three/examples/jsm/": "https://unpkg.com/three@0.150.1/examples/jsm/",
       "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/"
     }
   }
