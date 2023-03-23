@@ -17,18 +17,35 @@ export default async function handler(
       <!-- Required meta tags -->
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   <script>window.onerror = ${errorHandler.toString()}</script>
-  <script>
-  ` +
-    sketch +
-    `
-  </script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/"
+    }
+  }
+</script>
+  <style>
+  body, html {
+    margin: 0;
+    height: 100%;
+  }
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
       <title>CreativeGPT</title>
     </head>
     <body>
-    <main></main> 
     </body>
+    <script type="module">
+    ` +
+    sketch +
+    `
+    </script>
   </html>`;
   res.send(src);
 }

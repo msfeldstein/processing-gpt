@@ -9,15 +9,7 @@ const prelude = `You are a creative coding assistant who is going to help me wri
 const sketchBegin = "[BEGIN]";
 const sketchEnd = "[END]";
 
-const defaultScript = `function setup() {
-  createCanvas(500, 500);
-}
-
-function draw() {
-  background(0);
-  fill(255);
-  ellipse(250, 250, 100);
-}
+const defaultScript = `
 `;
 
 const placeholder = `What would you like to do to the sketch?
