@@ -5,18 +5,23 @@ import { types } from "../util/p5types";
 import Head from "next/head";
 import Image from "next/image";
 
-const prelude = `You are a creative coding assistant who is going to help me write p5js sketches.  Please respond only with the code that should be run, no explanations.  I will put the current code between [BEGIN] and [END] tokens, with the query of how i'd like you to modify the sketch below.  Be sure to only respond with the full representation of the modified code and no editorial or explanations.`;
-const sketchBegin = "[BEGIN]";
-const sketchEnd = "[END]";
+const preludeExplore = `"Given the following p5.js sketch, generate a subtly changed creative variation.  Give me a one sentence description of what you're doing followed by a code block with the complete code in it.  Please base it off the given sketch and explore a unique but subtly different direction with it.  Make sure to just write the description, and then the pure source code wrapped in \`\`\`\n\nPlease keep it mellow and calm, nothing too crazy.  Also add lots of comments explaining the code.\n\n`;
+const preludeGenerate = `You are a creative coding assistant who is going to help me write p5js sketches.  Please respond only with the code that should be run, no explanations.  I will put the current code between [BEGIN] and [END] tokens, with the query of how i'd like you to modify the sketch below.  Be sure to only respond with the full representation of the modified code and no editorial or explanations.\n\n`;
 
-const defaultScript = `function setup() {
-  createCanvas(500, 500);
+const defaultScript = `
+function setup() {
+  createCanvas(600, 600);
 }
 
 function draw() {
   background(0);
   fill(255);
-  ellipse(250, 250, 100);
+  noStroke();
+  // draw a horizontal, centered line about 50px wide every 5px from the top to the bottom of the screen
+  for (let i = 0; i <= height; i += 5) {
+    rectMode(CENTER);
+    rect(width / 2, i, 250, 1);
+  }
 }
 `;
 
@@ -48,6 +53,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [hasLoadedFromHash, setHasLoadedFromHash] = useState(false);
   const [hasEditor, setHasEditor] = useState(false);
+  const [sketches, setSketches] = useState<string[]>([]);
+  const [infos, setInfos] = useState<string[]>([]);
 
   const play = useCallback(() => {
     if (iframeRef.current && editorRef.current) {
@@ -58,6 +65,62 @@ export default function Home() {
     }
     setLastError(null);
   }, [editorRef]);
+
+  const choose = useCallback(
+    (i: number) => {
+      const editor = editorRef.current;
+      if (editor) {
+        // Need to do this instead of calling setValue so you can cmd+z it
+        editor.pushUndoStop();
+        editor.executeEdits("update-from-gpt", [
+          {
+            range: editor.getModel()!.getFullModelRange(),
+            text: sketches[i],
+          },
+        ]);
+        editor.pushUndoStop();
+        play();
+      }
+    },
+    [play, sketches]
+  );
+
+  const fetchExploration = async () => {
+    const editor = editorRef.current;
+    const query = preludeExplore + editor?.getValue();
+    console.log({ query });
+    let result = await fetch("/api/openai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query,
+      }),
+    }).then((r) => r.text());
+    let [info, sketch] = result.split("```");
+    console.log({ result, info, sketch });
+    sketch = sketch.replace("javascript", "");
+    console.log({ info, sketch });
+    return [info, sketch];
+  };
+
+  const explore = useCallback(async () => {
+    const editor = editorRef.current;
+    setLoading(true);
+    const newSketches = [];
+    const newInfos = [];
+    for (var i = 0; i < 3; i++) {
+      console.log("Querying", i);
+      let [info, sketch] = await fetchExploration();
+      newSketches.push(sketch);
+      newInfos.push(info);
+    }
+
+    setSketches(newSketches);
+    setInfos(newInfos);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     console.log("HASH", window.location.hash, editorRef.current);
@@ -119,11 +182,19 @@ export default function Home() {
   }
 
   async function onKeyDown(e: React.KeyboardEvent) {
+    if (sketches.length > 0) {
+      setSketches([]);
+      setInfos([]);
+    }
     if (e.key === "Enter" && editorRef.current) {
       const editor = editorRef.current;
       setLoading(true);
-      const currentSketch = editorRef.current.getValue();
-      const query = textareaRef.current?.value;
+      const query =
+        preludeGenerate +
+        "[BEGIN]\n" +
+        editorRef.current.getValue() +
+        "\n[END]\n\n" +
+        textareaRef.current?.value;
       let result = await fetch("/api/openai", {
         method: "POST",
         headers: {
@@ -131,9 +202,10 @@ export default function Home() {
         },
         body: JSON.stringify({
           query,
-          currentSketch,
         }),
       }).then((r) => r.text());
+      const [info, sketch] = result.split("```");
+      console.log({ info, sketch });
       result = result.replaceAll("[BEGIN]", "").replaceAll("[END]", "").trim();
       if (editor) {
         // Need to do this instead of calling setValue so you can cmd+z it
@@ -182,33 +254,40 @@ export default function Home() {
             }}
           />
         </div>
-        <div className="PreviewContainer">
-          <iframe
-            title="preview"
-            ref={iframeRef}
-            width={500}
-            height={500}
-          ></iframe>
-          <div id="controls">
-            <div id="button-row">
-              {/* <button
-                disabled={loading}
-                className="button"
-                onClick={() => setQuestionModeAndClear(false)}
-              >
-                Alter
-              </button>
-              <button
-                disabled={loading}
-                className="button"
-                onClick={() => setQuestionModeAndClear(true)}
-              >
-                Ask
-              </button> */}
-              <button disabled={loading} className="button" onClick={play}>
-                Play
-              </button>
+        <div id="controls">
+          <div id="button-row">
+            <button disabled={loading} className="button" onClick={play}>
+              Play
+            </button>
+            <button disabled={loading} className="button" onClick={explore}>
+              Explore
+            </button>
+          </div>
+          <div className="PreviewContainer">
+            <iframe
+              title="preview"
+              ref={iframeRef}
+              width={600}
+              height={600}
+            ></iframe>
+
+            <div className="ExplorationsContainer">
+              {sketches.map((sketch, i) => {
+                return (
+                  <div key={`frame${i}`} onClick={() => choose(i)}>
+                    <div className="ExplorationInfo">{infos[i]}</div>
+                    <div className="iframeContainer">
+                      <iframe
+                        src={"/api/viewer?sketch=" + encodeURIComponent(sketch)}
+                        width={600}
+                        height={600}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
+
             <div className="PromptContainer">
               <textarea
                 rows={9}

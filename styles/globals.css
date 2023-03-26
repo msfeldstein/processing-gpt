@@ -13,13 +13,37 @@ height: 100%;
 height: 100%;}
 
 .EditorContainer {
-  width: calc(100% - 550px);
+  width: calc(100% - 650px);
   height: 100%;
 }
 
 .PreviewContainer {
-  width: 550px;
+  width: 650px;
   border-left: 1px solid black;
+}
+
+.ExplorationsContainer {
+  display: flex;
+  flex-direction: row;
+  font-size: 10px;
+  justify-content: end;
+  align-content: end;
+  align-items: end;
+}
+
+.ExplorationsContainer > div {
+  width: 33%;
+}
+
+.ExplorationsContainer .iframeContainer {
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+}
+
+.ExplorationsContainer iframe {
+  transform: scale(30%);
+  transform-origin: top left;
 }
 
 iframe {
